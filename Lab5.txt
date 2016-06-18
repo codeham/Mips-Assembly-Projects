@@ -1,0 +1,126 @@
+#Cristian Avina Lopez
+#CS 264
+#Lab Assignment #5 Records
+
+		.data
+Records:		.space		480
+PromptA:		.asciiz		"\nEnter Name: "
+PromptB:		.asciiz		"\nEnter Age: "
+PromptC:		.asciiz		"\nEnter Salary: "
+PromptD:		.asciiz		"\nEnter Record between 0 to 8 to swap: "
+PrintA:			.asciiz		"\nName: "
+PrintB:			.asciiz		"Age: "
+PrintC:			.asciiz		"\nSalary: $"
+RecordA:		.asciiz		"\nRecord #"
+
+		.text
+		
+main:			li		$t1,	0				#$t1 is counter for storing Records
+			li		$t2,	480				#$t2 is end space value
+			li		$t3,	0				#$t3 is counter for reading Records
+			li		$t5,	8				#$t5 is check for last record
+			li		$t6,	1				#$t6 is to make sure swap happens only once
+			li		$s1,	48				#$s1 is to make sure only 48 spaces are swapped
+			li		$s4,	0				#$s4 holds record count #
+			
+StoreL:			la		$a0,	PromptA				#Prints prompt for Enter name
+			li 		$v0,	4
+			syscall
+			la 		$a0,	Records				#Loads Records onto $a0 for storing
+			add		$a0,	$a0, $t1			#Get location for storing the name
+			addi	$t1,	$t1, 40					#Increase $t1 to the next location
+			li 		$v0,	8
+			li 		$a1,	40				#Preserved space for name
+			syscall
+			
+			la		$a0,	PromptB				#Prints prompt for Enter age
+			li 		$v0,	4
+			syscall
+			la 		$a0,	Records				#Loads Records onto $a0 for storing
+			add		$a0,	$a0, $t1			#Get location for storing the age
+			addi	$t1,	$t1, 4					#Increase $t1 to the next location
+			li 		$v0,	5
+			syscall
+			sw		$v0,	0($a0)				#Store value into Records
+			
+			la		$a0,	PromptC				#Prints prompt for Enter Salary
+			li 		$v0,	4
+			syscall
+			la 		$a0,	Records				#Loads Records onto $a0 for storing
+			add		$a0,	$a0, $t1			#Get location for storing the salary
+			addi	$t1,	$t1, 4					#Increase $t1 to the next location
+			li 		$v0,	5
+			syscall
+			sw		$v0,	0($a0)				#Store value into Records
+			
+			blt		$t1,	$t2, StoreL			#Loops back until it finishes 10 records (480 spaces)
+
+PrintR:		la		$a0,	RecordA					#Prints Record prompt
+			li		$v0,	4
+			syscall
+			move	$a0,	$s4					#Prints the #
+			li		$v0,	1
+			syscall
+			addi	$s4,	$s4, 1
+			
+			la		$a0,	PrintA				#Prints name
+			li 		$v0,	4
+			syscall
+			la 		$a0,	Records				#Loads Records onto $a0 for printing
+			li		$v0,	4
+			add		$a0,	$a0, $t3			#Get location for printing the name
+			addi	$t3,	$t3, 40					#Increase $t3 to the next location
+			syscall
+			
+			la		$a0,	PrintB				#Prints age
+			li 		$v0,	4
+			syscall
+			la 		$a0,	Records				#Loads Records onto $a0 for printing
+			li		$v0,	1
+			add		$a0,	$a0, $t3			#Get location for printing the age
+			lw		$t4,	0($a0)				#Get age to be printed
+			move	$a0,	$t4
+			syscall
+			addi	$t3,	$t3, 4					#Increase $t3 to the next location
+			
+			la		$a0,	PrintC				#Prints salary
+			li 		$v0,	4
+			syscall
+			la 		$a0,	Records				#Loads Records onto $a0 for printing
+			li		$v0,	1
+			add		$a0,	$a0, $t3			#Get location for printing the salary
+			lw		$t4,	0($a0)				#Get salary to be printed
+			move	$a0,	$t4
+			syscall
+			addi	$t3,	$t3, 4					#Increase $t3 to the next location
+			
+			blt		$t3,	$t2, PrintR			#Loops back until it finishes 10 records (480 spaces)
+			beqz	$t6,	finish					#Check if swap occured already
+			
+GetRecord:	la		$a0,	PromptD					#Prints prompt for Record # to be swapped
+			li 		$v0,	4
+			syscall
+			li		$v0,	5				#Get user input for #Record # to be stored in $v0
+			syscall
+			bltz	$v0,	GetRecord				#Check if user inputted less than 0, ask for record # again
+			bgt		$v0,	$t5, GetRecord			#Check if user inputted greater than 8, ask for record # again
+			move	$t6,	$v0					#Copy value from $v0 to $t6
+			mul		$t6,	$t6, $s1			#Set $t6 to its record position
+			la		$a0,	Records				#Loads Records onto $a0 for swapping
+			add		$a0,	$a0, $t6			#Move to the correct record position
+			
+Swapping:	lw		$s2,	0($a0)					#Get value at current position
+			lw		$s3,	48($a0)				#Get its adjacent(next record's) value
+			sw		$s3,	0($a0)				#Swap 4 byte at a time
+			sw		$s2,	48($a0)				#Swap 4 byte at a time
+			addi	$a0,	$a0, 4					#Move to the next 4 byte 
+			addi	$s1,	$s1, -4					#Decrease $s1 by 4 until 48 hits 0
+			bgtz	$s1,	Swapping				#Check if swapping is finished
+			
+			li		$s4,	0				#Reset record # to 0
+			li 		$t3,	0				#Reset print record counter to 0
+			li		$t6,	0				#Set $t6 to 0 to be finished swapping
+			b		PrintR					#Go back to printing all the records
+			
+finish:		li		$v0,	10					#Terminate program
+			syscall

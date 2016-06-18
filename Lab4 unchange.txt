@@ -1,0 +1,116 @@
+#Cristian Avina Lopez
+#CS 264
+#Lab Assignment #4
+
+		.data
+Prompt:			.asciiz 	"\nThe printed value is: "
+
+		.text
+		#$t0 = -4, $t1 = -2^31, $t2 = 2^30, $t3 = 65
+		
+main:		li 		$t0,	-4				#t0 = 1111.....1100
+			li		$t1,	-2147483648		#t1 = 1000.....0000
+			li		$t2,	1073741824		#t2 = 0010.....0000
+			li		$t3,	65				#t3 = 000...1000001
+			
+			
+			srl  	$t4, 	$t0,2			#Decimal value is 
+			
+			#Binary value is 001111....11
+			
+			la		$a0,	Prompt			#Prints display msg
+			li		$v0,	4
+			syscall
+			move 	$a0,	$t4				
+			li		$v0,	1
+			syscall
+			
+			sra 	$t4,	$t0,2			#Decimal value is  
+			
+			#Binary value is 111....1111
+			
+			#la		$a0,	Prompt			#Prints display msg
+			#li		$v0,	4
+			#syscall
+			#move 	$a0,	$t4				
+			#li		$v0,	1
+			#syscall
+			
+			
+			sll		$t4,	$t0,1			#Decimal value is 
+			
+			#Binary value is 111..11000
+			
+			
+			#la		$a0,	Prompt			#Prints display msg
+			#li		$v0,	4
+			#syscall
+			#move 	$a0,	$t4				
+			#li		$v0,	1
+			#syscall
+			
+			
+			rol		$t4,	$t0,2
+
+			
+			
+			ror 	$t4,	$t0,2
+
+			
+			
+			xor		$t4,	$t0,$t1
+
+			
+			xor 	$t4, 	$t1,-8
+
+		
+			
+			add 	$t4,	$t0,$t1
+
+			
+			
+			addu 	$t4, 	$t0,$t1
+
+			
+			
+			mul  	$t4, 	$t1,$t2
+
+			
+			
+			mulo 	$t4,	$t1,$t2
+
+			
+			
+			mulou 	$t4,	$t0,$t0
+
+			
+			
+			mulou 	$t4,	$t3,$t3
+
+			
+			
+			div 	$t4, 	$t1,$t0
+
+			
+			
+			div 	$t4, 	$t3,$t0
+
+			
+			
+			divu 	$t4, 	$t1,$t0
+
+			
+			
+			sub  	$t4, 	$t1,$t0
+
+			
+			
+			subu  	$t4, 	$t1,$t0
+
+			
+			
+			mult 	$t1,	$t2  #print the hi and low register 
+
+			
+			
+			multu 	$t0, 	$t3 
